@@ -1,4 +1,4 @@
-import WeeklySchedule from '@/components/WeeklySchedule';
+import WeeklySchedule from '../../components/WeeklySchedule';
 
 export default function SchedulePage() {
   return (
