@@ -29,7 +29,7 @@ export default function SignInForm() {
       if (error) {
         // Handle specific error cases
         if (error.message.includes('Invalid login credentials')) {
-          setError('Email or password is incorrect. If you haven\'t registered yet, please sign up first.')
+          setError('Email or password is incorrect. If you haven&apos;t registered yet, please sign up first.')
         } else if (error.message.includes('Email not confirmed')) {
           setError('Please verify your email before signing in.')
         } else {
@@ -49,8 +49,9 @@ export default function SignInForm() {
 
       router.push('/schedule')
       router.refresh()
-    } catch (err) {
-      setError('An unexpected error occurred. Please try again.')
+    } catch (error) {
+      console.error('Sign in error:', error)
+      setError("Email or password is incorrect. If you haven&apos;t registered yet, please sign up first.")
       setLoading(false)
     }
   }

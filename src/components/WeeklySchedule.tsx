@@ -50,17 +50,13 @@ export default function WeeklySchedule() {
           return;
         }
 
-        // Only show modal if no apartment data exists or apt_number is null
-        if (!apartmentData || !apartmentData.apt_number) {
+        if (!apartmentData?.apt_number) {
           setShowApartmentModal(true);
-        } else {
-          setShowApartmentModal(false);
         }
       } catch (error) {
-        console.error('Unexpected error checking apartment number:', error);
+        console.error('Error checking apartment number:', error);
       }
     };
-
     checkApartmentNumber();
   }, [supabase]);
 
