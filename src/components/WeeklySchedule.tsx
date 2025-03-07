@@ -6,11 +6,6 @@ import { createClient } from '@/lib/supabase/client';
 import ApartmentNumberModal from './ApartmentNumberModal';
 import { FaTrash } from 'react-icons/fa';
 
-interface WeeklyScheduleProps {
-  userSlot?: string;
-  bookedSlots?: BookedSlot[];
-}
-
 interface BookedSlot {
   reserved_timeslot: string;
   apt_number: string;
@@ -136,11 +131,6 @@ export default function WeeklySchedule() {
     if (selectedSlot && userSlots.length < MAX_RESERVATIONS) {
       router.push(`/schedule/confirm?slot=${encodeURIComponent(selectedSlot)}`);
     }
-  };
-
-  const isSlotAvailable = (day: string, hour: string) => {
-    const slot = `${day}-${hour}`;
-    return !isSlotBooked(day, hour);
   };
 
   const isUserSlot = (day: string, hour: string) => {
