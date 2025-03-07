@@ -20,19 +20,39 @@ export default function SignInForm() {
     setLoading(true)
     setError(null)
 
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    })
+    try {
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      })
 
-    if (error) {
-      setError(error.message)
+      if (error) {
+        // Handle specific error cases
+        if (error.message.includes('Invalid login credentials')) {
+          setError('Email or password is incorrect. If you haven\'t registered yet, please sign up first.')
+        } else if (error.message.includes('Email not confirmed')) {
+          setError('Please verify your email before signing in.')
+        } else {
+          setError('Unable to sign in. Please check your credentials and try again.')
+        }
+        setLoading(false)
+        return
+      }
+
+      // Check if email is verified
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user?.email_confirmed_at) {
+        setError('Please verify your email before signing in. Check your inbox for the verification link.')
+        setLoading(false)
+        return
+      }
+
+      router.push('/schedule')
+      router.refresh()
+    } catch (err) {
+      setError('An unexpected error occurred. Please try again.')
       setLoading(false)
-      return
     }
-
-    router.push('/schedule')
-    router.refresh()
   }
 
   return (

@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
 
 export default function Profile() {
+  const [userId, setUserId] = useState<string | null>(null);
   const [email, setEmail] = useState<string | null>(null);
   const [apartmentNumber, setApartmentNumber] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -15,17 +16,18 @@ export default function Profile() {
     async function loadProfile() {
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
+        setUserId(user.id);
         setEmail(user.email || null);
         
         // Fetch apartment number
         const { data: profile } = await supabase
-          .from('profiles')
-          .select('apartment_number')
+          .from('apartments')
+          .select('apt_number')
           .eq('id', user.id)
           .single();
         
         if (profile) {
-          setApartmentNumber(profile.apartment_number);
+          setApartmentNumber(profile.apt_number);
         }
       }
       setLoading(false);
@@ -48,6 +50,10 @@ export default function Profile() {
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6">
       <h2 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white">Profile</h2>
       <div className="space-y-4">
+        <div>
+          <label className="text-sm font-medium text-gray-500 dark:text-gray-400">User ID</label>
+          <p className="text-gray-900 dark:text-white font-mono">{userId}</p>
+        </div>
         <div>
           <label className="text-sm font-medium text-gray-500 dark:text-gray-400">Email</label>
           <p className="text-gray-900 dark:text-white">{email}</p>

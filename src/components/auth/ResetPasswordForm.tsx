@@ -16,33 +16,43 @@ export default function ResetPasswordForm() {
     setLoading(true)
     setError(null)
 
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/auth/update-password`,
-    })
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/auth/update-password`,
+      })
 
-    if (error) {
-      setError(error.message)
+      if (error) {
+        setError(error.message)
+        setLoading(false)
+        return
+      }
+
+      setSuccess(true)
+    } catch (err) {
+      setError('An unexpected error occurred. Please try again.')
+    } finally {
       setLoading(false)
-      return
     }
-
-    setSuccess(true)
-    setLoading(false)
   }
 
   if (success) {
     return (
-      <div className="text-center">
+      <div className="text-center space-y-4">
         <h2 className="text-xl font-semibold mb-4">Check your email</h2>
         <p className="text-gray-600 dark:text-gray-300 mb-4">
           We've sent you a password reset link. Please check your email.
         </p>
-        <Link
-          href="/auth/signin"
-          className="text-blue-600 hover:text-blue-500 dark:text-blue-400"
-        >
-          Back to Sign In
-        </Link>
+        <p className="text-sm text-gray-500 dark:text-gray-400">
+          If you don't see the email, please check your spam folder.
+        </p>
+        <div className="mt-6">
+          <Link
+            href="/auth/signin"
+            className="text-blue-600 hover:text-blue-500 dark:text-blue-400"
+          >
+            Back to Sign In
+          </Link>
+        </div>
       </div>
     )
   }

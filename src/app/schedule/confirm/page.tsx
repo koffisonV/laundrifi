@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 
+const MAX_RESERVATIONS = 3;
+
 export default function ConfirmationPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -19,33 +21,44 @@ export default function ConfirmationPage() {
     setError(null);
 
     try {
-      // Get current user's profile
+      // Get current user
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
         router.push('/auth/signin');
         return;
       }
 
+      // Check current number of reservations
+      const { data: existingReservations } = await supabase
+        .from('reservations')
+        .select('reserved_timeslot')
+        .eq('id', user.id);
+
+      if (existingReservations && existingReservations.length >= MAX_RESERVATIONS) {
+        setError(`You have reached the maximum number of reservations (${MAX_RESERVATIONS})`);
+        return;
+      }
+
       // Get user's apartment number
-      const { data: profile } = await supabase
-        .from('profiles')
-        .select('apartment_number')
+      const { data: apartment } = await supabase
+        .from('apartments')
+        .select('apt_number')
         .eq('id', user.id)
         .single();
 
-      if (!profile) {
-        setError('Profile not found');
+      if (!apartment) {
+        setError('Please set your apartment number before booking');
         return;
       }
 
       // Save the booking
       const { error: bookingError } = await supabase
-        .from('laundry_bookings')
+        .from('reservations')
         .insert([
           {
-            user_id: user.id,
-            apartment_number: profile.apartment_number,
-            slot_time: new Date(slot).toISOString(),
+            id: user.id,
+            apt_number: apartment.apt_number,
+            reserved_timeslot: slot,
           },
         ]);
 
