@@ -109,7 +109,7 @@ export default function SignInForm() {
           href="/auth/signup"
           className="text-sm text-blue-600 hover:text-blue-500 dark:text-blue-400"
         >
-          Don't have an account?
+          Don&apos;t have an account?
         </Link>
       </div>
       <button
