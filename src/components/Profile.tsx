@@ -34,7 +34,7 @@ export default function Profile() {
     }
 
     loadProfile();
-  }, []);
+  }, [supabase]);
 
   const handleLogout = async () => {
     await supabase.auth.signOut();

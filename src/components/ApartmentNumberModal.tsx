@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 
 interface ApartmentNumberModalProps {
@@ -38,8 +38,9 @@ export default function ApartmentNumberModal({ isOpen, onClose, userId }: Apartm
       }
 
       onClose()
-    } catch (err) {
+    } catch (error) {
       setError('An unexpected error occurred. Please try again.')
+      console.error('Apartment number error:', error)
     } finally {
       setLoading(false)
     }

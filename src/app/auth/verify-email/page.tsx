@@ -6,10 +6,10 @@ export default function VerifyEmailPage() {
       <div className="w-full max-w-md p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg text-center">
         <h1 className="text-2xl font-bold mb-6 text-foreground">Check Your Email</h1>
         <p className="text-gray-600 dark:text-gray-300 mb-4">
-          We've sent you an email with a verification link. Please check your inbox and click the link to verify your account.
+          We&apos;ve sent you an email with a verification link. Please check your inbox and click the link to verify your account.
         </p>
         <p className="text-sm text-gray-500 dark:text-gray-400 mb-8">
-          If you don't see the email, check your spam folder.
+          If you don&apos;t see the email, check your spam folder.
         </p>
         
         <div className="space-y-4">

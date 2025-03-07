@@ -7,8 +7,8 @@ import ApartmentNumberModal from './ApartmentNumberModal';
 import { FaTrash } from 'react-icons/fa';
 
 interface WeeklyScheduleProps {
-  userSlot?: string | null;
-  bookedSlots: string[];
+  userSlot?: string;
+  bookedSlots?: BookedSlot[];
 }
 
 interface BookedSlot {
@@ -22,7 +22,7 @@ const HOURS = Array.from({ length: 24 }, (_, i) =>
   i === 0 ? '12 AM' : i < 12 ? `${i} AM` : i === 12 ? '12 PM' : `${i-12} PM`
 );
 
-export default function WeeklySchedule({ userSlot: initialUserSlot, bookedSlots: initialBookedSlots }: WeeklyScheduleProps) {
+export default function WeeklySchedule() {
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
   const [bookedSlots, setBookedSlots] = useState<BookedSlot[]>([]);
   const [userSlots, setUserSlots] = useState<string[]>([]);
@@ -61,13 +61,13 @@ export default function WeeklySchedule({ userSlot: initialUserSlot, bookedSlots:
         } else {
           setShowApartmentModal(false);
         }
-      } catch (err) {
-        console.error('Unexpected error checking apartment number:', err);
+      } catch (error) {
+        console.error('Unexpected error checking apartment number:', error);
       }
     };
 
     checkApartmentNumber();
-  }, []);
+  }, [supabase]);
 
   useEffect(() => {
     const fetchReservations = async () => {

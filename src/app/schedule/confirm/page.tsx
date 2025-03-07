@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 
@@ -68,8 +68,9 @@ export default function ConfirmationPage() {
       }
 
       router.push('/schedule');
-    } catch (err) {
+    } catch (error) {
       setError('An error occurred while booking');
+      console.error('Booking error:', error);
     } finally {
       setLoading(false);
     }
