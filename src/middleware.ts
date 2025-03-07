@@ -1,12 +1,13 @@
-import { createServerClient } from '@supabase/ssr'
+import { createServerClient, type CookieOptions } from '@supabase/ssr'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
+import type { Database } from '@/types/supabase'
 
 export async function middleware(request: NextRequest) {
-  const response = NextResponse.next()
+  let response = NextResponse.next()
 
   // Create a Supabase client configured to use cookies
-  const supabase = createServerClient(
+  const supabase = createServerClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
@@ -14,11 +15,21 @@ export async function middleware(request: NextRequest) {
         get(name: string) {
           return request.cookies.get(name)?.value
         },
-        set(name: string, value: string, options: any) {
+        set(name: string, value: string, options: CookieOptions) {
+          // If we're on a secure connection, enforce secure cookies
+          if (request.url.startsWith('https://')) {
+            options.secure = true
+          }
+          
           request.cookies.set({
             name,
             value,
             ...options,
+          })
+          response = NextResponse.next({
+            request: {
+              headers: request.headers,
+            },
           })
           response.cookies.set({
             name,
@@ -26,11 +37,16 @@ export async function middleware(request: NextRequest) {
             ...options,
           })
         },
-        remove(name: string, options: any) {
+        remove(name: string, options: CookieOptions) {
           request.cookies.set({
             name,
             value: '',
             ...options,
+          })
+          response = NextResponse.next({
+            request: {
+              headers: request.headers,
+            },
           })
           response.cookies.set({
             name,

@@ -28,8 +28,9 @@ export default function ResetPasswordForm() {
       }
 
       setSuccess(true)
-    } catch (err) {
+    } catch (error) {
       setError('An unexpected error occurred. Please try again.')
+      console.error('Reset password error:', error)
     } finally {
       setLoading(false)
     }
@@ -40,10 +41,10 @@ export default function ResetPasswordForm() {
       <div className="text-center space-y-4">
         <h2 className="text-xl font-semibold mb-4">Check your email</h2>
         <p className="text-gray-600 dark:text-gray-300 mb-4">
-          We've sent you a password reset link. Please check your email.
+          We&apos;ve sent you a password reset link. Please check your email.
         </p>
         <p className="text-sm text-gray-500 dark:text-gray-400">
-          If you don't see the email, please check your spam folder.
+          If you don&apos;t see the email, please check your spam folder.
         </p>
         <div className="mt-6">
           <Link
