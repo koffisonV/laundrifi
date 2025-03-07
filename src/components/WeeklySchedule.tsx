@@ -22,7 +22,7 @@ const HOURS = Array.from({ length: 24 }, (_, i) =>
   i === 0 ? '12 AM' : i < 12 ? `${i} AM` : i === 12 ? '12 PM' : `${i-12} PM`
 );
 
-export default function WeeklySchedule({ userSlot, bookedSlots = [] }: WeeklyScheduleProps) {
+export default function WeeklySchedule({ bookedSlots = [] }: WeeklyScheduleProps) {
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
   const [userSlots, setUserSlots] = useState<string[]>([]);
   const [showApartmentModal, setShowApartmentModal] = useState(false);
