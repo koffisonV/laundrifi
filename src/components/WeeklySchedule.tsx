@@ -109,7 +109,7 @@ export default function WeeklySchedule() {
     return () => {
       channel.unsubscribe();
     };
-  }, []);
+  }, [supabase]);
 
   const handleSlotClick = (day: string, hour: string) => {
     const slot = `${day}-${hour}`;
