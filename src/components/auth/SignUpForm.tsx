@@ -71,8 +71,9 @@ export default function SignUpForm() {
       if (authData?.user) {
         router.push('/auth/verify-email')
       }
-    } catch (err) {
-      setError('An unexpected error occurred. Please try again.')
+    } catch (error) {
+      console.error('Sign up error:', error)
+      setError('An unexpected error occurred during sign up. Please try again.')
       setLoading(false)
     }
   }

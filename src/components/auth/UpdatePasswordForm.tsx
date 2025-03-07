@@ -64,8 +64,9 @@ export default function UpdatePasswordForm() {
 
       // Password updated successfully
       router.push('/auth/signin')
-    } catch (err) {
-      setError('An unexpected error occurred. Please try again.')
+    } catch (error) {
+      console.error('Password update error:', error)
+      setError('An unexpected error occurred while updating your password.')
       setLoading(false)
     }
   }

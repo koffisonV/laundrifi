@@ -6,11 +6,6 @@ import { createClient } from '@/lib/supabase/client';
 import ApartmentNumberModal from './ApartmentNumberModal';
 import { FaTrash } from 'react-icons/fa';
 
-interface WeeklyScheduleProps {
-  userSlot?: string;
-  bookedSlots?: BookedSlot[];
-}
-
 interface BookedSlot {
   reserved_timeslot: string;
   apt_number: string;
@@ -55,17 +50,13 @@ export default function WeeklySchedule() {
           return;
         }
 
-        // Only show modal if no apartment data exists or apt_number is null
-        if (!apartmentData || !apartmentData.apt_number) {
+        if (!apartmentData?.apt_number) {
           setShowApartmentModal(true);
-        } else {
-          setShowApartmentModal(false);
         }
       } catch (error) {
-        console.error('Unexpected error checking apartment number:', error);
+        console.error('Error checking apartment number:', error);
       }
     };
-
     checkApartmentNumber();
   }, [supabase]);
 
@@ -136,11 +127,6 @@ export default function WeeklySchedule() {
     if (selectedSlot && userSlots.length < MAX_RESERVATIONS) {
       router.push(`/schedule/confirm?slot=${encodeURIComponent(selectedSlot)}`);
     }
-  };
-
-  const isSlotAvailable = (day: string, hour: string) => {
-    const slot = `${day}-${hour}`;
-    return !isSlotBooked(day, hour);
   };
 
   const isUserSlot = (day: string, hour: string) => {
