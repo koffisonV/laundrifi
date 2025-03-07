@@ -11,15 +11,19 @@ interface BookedSlot {
   apt_number: string;
 }
 
+interface WeeklyScheduleProps {
+  userSlot?: string | null;
+  bookedSlots?: string[];
+}
+
 const MAX_RESERVATIONS = 3;
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 const HOURS = Array.from({ length: 24 }, (_, i) => 
   i === 0 ? '12 AM' : i < 12 ? `${i} AM` : i === 12 ? '12 PM' : `${i-12} PM`
 );
 
-export default function WeeklySchedule() {
+export default function WeeklySchedule({ bookedSlots = [] }: WeeklyScheduleProps) {
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
-  const [bookedSlots, setBookedSlots] = useState<BookedSlot[]>([]);
   const [userSlots, setUserSlots] = useState<string[]>([]);
   const [showApartmentModal, setShowApartmentModal] = useState(false);
   const [userId, setUserId] = useState<string | null>(null);
@@ -77,16 +81,6 @@ export default function WeeklySchedule() {
         } else {
           setUserSlots([]);
         }
-
-        // Get all other reservations
-        const { data: allReservations } = await supabase
-          .from('reservations')
-          .select('reserved_timeslot, apt_number')
-          .neq('id', user.id);
-
-        if (allReservations) {
-          setBookedSlots(allReservations);
-        }
       } catch (err) {
         console.error('Error fetching reservations:', err);
       }
@@ -120,7 +114,7 @@ export default function WeeklySchedule() {
 
   const isSlotBooked = (day: string, hour: string) => {
     const slot = `${day}-${hour}`;
-    return bookedSlots.some(bookedSlot => bookedSlot.reserved_timeslot === slot);
+    return bookedSlots.includes(slot);
   };
 
   const handleConfirmBooking = async () => {
