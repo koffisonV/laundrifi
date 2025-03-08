@@ -6,11 +6,6 @@ import { createClient } from '@/lib/supabase/client';
 import ApartmentNumberModal from './ApartmentNumberModal';
 import { FaTrash } from 'react-icons/fa';
 
-interface BookedSlot {
-  reserved_timeslot: string;
-  apt_number: string;
-}
-
 interface WeeklyScheduleProps {
   userSlot?: string | null;
   bookedSlots?: string[];
