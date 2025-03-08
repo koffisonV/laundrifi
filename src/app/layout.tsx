@@ -14,7 +14,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "LaundryFi",
+  title: "LaundriFi",
   description: "Laundry scheduling application",
 };
 
