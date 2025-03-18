@@ -4,9 +4,10 @@
   <img src="public/images/laundrifiSS.png" alt="LaundriFi Screenshot" width="600"/>
   
   [![Next.js](https://img.shields.io/badge/Next.js-14.0.0-black?logo=next.js)](https://nextjs.org)
-  [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.3.0-38B2AC?logo=tailwind-css)](https://tailwindcss.com)
   [![Supabase](https://img.shields.io/badge/Supabase-Latest-3ECF8E?logo=supabase)](https://supabase.com)
+  [![Docker](https://img.shields.io/badge/Docker-Latest-2496ED?logo=docker)](https://www.docker.com)
   [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Latest-336791?logo=postgresql)](https://www.postgresql.org)
+  [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-3.3.0-38B2AC?logo=tailwind-css)](https://tailwindcss.com)
   [![Cron](https://img.shields.io/badge/Cron-Scheduled-FF6B6B?logo=clockify)](https://crontab.guru)
 
   [Watch Demo](https://youtu.be/1uK_ddNC_T8) | [Live Site](https://laundrifi.vercel.app)
