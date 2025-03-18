@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { FaEye, FaEyeSlash } from 'react-icons/fa'
+import Turnstile from './Turnstile'
 
 export default function SignInForm() {
   const [email, setEmail] = useState('')
@@ -12,6 +13,7 @@ export default function SignInForm() {
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [passwordVisible, setPasswordVisible] = useState(false)
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null)
   const router = useRouter()
   const supabase = createClient()
 
@@ -20,18 +22,30 @@ export default function SignInForm() {
     setLoading(true)
     setError(null)
 
+    if (!turnstileToken) {
+      setError('Please complete the security check')
+      setLoading(false)
+      return
+    }
+
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      const { error: signInError } = await supabase.auth.signInWithPassword({
         email,
         password,
+        options: {
+          captchaToken: turnstileToken
+        }
       })
 
-      if (error) {
+      if (signInError) {
+        console.error('Sign in error:', signInError)
         // Handle specific error cases
-        if (error.message.includes('Invalid login credentials')) {
+        if (signInError.message.includes('Invalid login credentials')) {
           setError('Email or password is incorrect. If you have not registered yet, please sign up first.')
-        } else if (error.message.includes('Email not confirmed')) {
+        } else if (signInError.message.includes('Email not confirmed')) {
           setError('Please verify your email before signing in.')
+        } else if (signInError.status === 500) {
+          setError('Server error. Please try again in a few moments.')
         } else {
           setError('Unable to sign in. Please check your credentials and try again.')
         }
@@ -40,7 +54,14 @@ export default function SignInForm() {
       }
 
       // Check if email is verified
-      const { data: { user } } = await supabase.auth.getUser()
+      const { data: { user }, error: userError } = await supabase.auth.getUser()
+      if (userError) {
+        console.error('Error getting user:', userError)
+        setError('An error occurred while verifying your account.')
+        setLoading(false)
+        return
+      }
+
       if (!user?.email_confirmed_at) {
         setError('Please verify your email before signing in. Check your inbox for the verification link.')
         setLoading(false)
@@ -51,7 +72,7 @@ export default function SignInForm() {
       router.refresh()
     } catch (error) {
       console.error('Sign in error:', error)
-      setError("Email or password is incorrect. If you have not registered yet, please sign up first.")
+      setError('An unexpected error occurred. Please try again.')
       setLoading(false)
     }
   }
@@ -98,6 +119,7 @@ export default function SignInForm() {
           </button>
         </div>
       </div>
+      <Turnstile onVerify={setTurnstileToken} />
       <div className="flex items-center justify-between">
         <Link
           href="/auth/reset-password"
