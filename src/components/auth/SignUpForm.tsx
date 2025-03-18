@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { FaEye, FaEyeSlash } from 'react-icons/fa'
+import Turnstile from './Turnstile'
 
 export default function SignUpForm() {
   const [email, setEmail] = useState('')
@@ -14,6 +15,7 @@ export default function SignUpForm() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null)
   const router = useRouter()
   const supabase = createClient()
 
@@ -21,6 +23,12 @@ export default function SignUpForm() {
     e.preventDefault()
     setLoading(true)
     setError(null)
+
+    if (!turnstileToken) {
+      setError('Please complete the security check')
+      setLoading(false)
+      return
+    }
 
     // Password validation
     if (password.length < 8) {
@@ -59,10 +67,12 @@ export default function SignUpForm() {
         password,
         options: {
           emailRedirectTo: `${window.location.origin}/schedule`,
+          captchaToken: turnstileToken
         },
       })
 
       if (authError) {
+        console.error('Sign up error:', authError)
         setError(authError.message)
         setLoading(false)
         return
@@ -142,6 +152,7 @@ export default function SignUpForm() {
           </button>
         </div>
       </div>
+      <Turnstile onVerify={setTurnstileToken} action="signup" />
       <div className="text-right">
         <Link
           href="/auth/signin"

@@ -3,12 +3,14 @@
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
+import Turnstile from './Turnstile'
 
 export default function ResetPasswordForm() {
   const [email, setEmail] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
   const [loading, setLoading] = useState(false)
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null)
   const supabase = createClient()
 
   const handleResetPassword = async (e: React.FormEvent) => {
@@ -16,21 +18,32 @@ export default function ResetPasswordForm() {
     setLoading(true)
     setError(null)
 
-    try {
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/auth/update-password`,
-      })
+    if (!turnstileToken) {
+      setError('Please complete the security check')
+      setLoading(false)
+      return
+    }
 
-      if (error) {
-        setError(error.message)
+    try {
+      const { error: resetError } = await supabase.auth.resetPasswordForEmail(
+        email,
+        {
+          captchaToken: turnstileToken,
+          redirectTo: `${window.location.origin}/auth/update-password`,
+        }
+      )
+
+      if (resetError) {
+        console.error('Reset password error:', resetError)
+        setError(resetError.message)
         setLoading(false)
         return
       }
 
       setSuccess(true)
     } catch (error) {
-      setError('An unexpected error occurred. Please try again.')
       console.error('Reset password error:', error)
+      setError('An unexpected error occurred. Please try again.')
     } finally {
       setLoading(false)
     }
@@ -78,6 +91,7 @@ export default function ResetPasswordForm() {
           required
         />
       </div>
+      <Turnstile onVerify={setTurnstileToken} action="reset_password" />
       <div className="text-right">
         <Link
           href="/auth/signin"
