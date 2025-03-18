@@ -78,7 +78,6 @@ export default function Turnstile({ onVerify, onError, action }: TurnstileProps)
             theme: 'light',
             language: 'auto',
             'refresh-expired': 'auto',
-            size: 'invisible',
           })
         }
       } catch (err) {
@@ -139,7 +138,8 @@ export default function Turnstile({ onVerify, onError, action }: TurnstileProps)
   return (
     <div 
       ref={containerRef}
-      style={{ display: 'none' }}
+      className="flex justify-center my-4"
+      style={{ minHeight: '65px' }}
     />
   )
 } 
