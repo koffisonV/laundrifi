@@ -2,9 +2,29 @@
 
 import { useEffect, useRef } from 'react'
 
+interface TurnstileObject {
+  render: (
+    container: string | HTMLElement,
+    options: {
+      sitekey: string
+      callback: (token: string) => void
+      'error-callback'?: () => void
+      'expired-callback'?: () => void
+      action?: string
+      theme?: 'light' | 'dark' | 'auto'
+      language?: string
+      'refresh-expired'?: 'auto' | 'manual'
+      size?: 'normal' | 'compact' | 'invisible'
+    }
+  ) => string
+  remove: (widgetId: string) => void
+  reset: (widgetId: string) => void
+  ready: (callback: () => void) => void
+}
+
 declare global {
   interface Window {
-    turnstile: any
+    turnstile: TurnstileObject
     onTurnstileLoad?: () => void
     turnstileQueue?: Array<() => void>
   }
@@ -39,7 +59,7 @@ export default function Turnstile({ onVerify, onError, action }: TurnstileProps)
 
           // Render new widget
           widgetId.current = window.turnstile.render(containerRef.current, {
-            sitekey: process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY,
+            sitekey: process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || '',
             callback: (token: string) => {
               console.log('Turnstile verification successful')
               onVerify(token)
