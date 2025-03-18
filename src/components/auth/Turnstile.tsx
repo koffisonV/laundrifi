@@ -37,8 +37,8 @@ interface TurnstileProps {
 }
 
 export default function Turnstile({ onVerify, onError, action }: TurnstileProps) {
-  const containerRef = useRef<HTMLDivElement>(null)
-  const widgetId = useRef<string>()
+  const containerRef = useRef<HTMLDivElement | null>(null)
+  const widgetId = useRef<string | undefined>(undefined)
 
   useEffect(() => {
     let mounted = true
@@ -88,9 +88,7 @@ export default function Turnstile({ onVerify, onError, action }: TurnstileProps)
     }
 
     // Initialize queue if it doesn't exist
-    if (!window.turnstileQueue) {
-      window.turnstileQueue = []
-    }
+    window.turnstileQueue = window.turnstileQueue || []
 
     const loadTurnstile = () => {
       // If script is already loaded, initialize immediately
@@ -100,7 +98,7 @@ export default function Turnstile({ onVerify, onError, action }: TurnstileProps)
       }
 
       // Add to queue if script is loading
-      window.turnstileQueue.push(initTurnstile)
+      window.turnstileQueue?.push(initTurnstile)
 
       // Check if script is already being loaded
       if (document.querySelector('script[src*="turnstile"]')) {
