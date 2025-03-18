@@ -2,9 +2,29 @@
 
 import { useEffect, useRef } from 'react'
 
+interface TurnstileObject {
+  render: (
+    container: string | HTMLElement,
+    options: {
+      sitekey: string
+      callback: (token: string) => void
+      'error-callback'?: () => void
+      'expired-callback'?: () => void
+      action?: string
+      theme?: 'light' | 'dark' | 'auto'
+      language?: string
+      'refresh-expired'?: 'auto' | 'manual'
+      size?: 'normal' | 'compact' | 'invisible'
+    }
+  ) => string
+  remove: (widgetId: string) => void
+  reset: (widgetId: string) => void
+  ready: (callback: () => void) => void
+}
+
 declare global {
   interface Window {
-    turnstile: any
+    turnstile: TurnstileObject
     onTurnstileLoad?: () => void
     turnstileQueue?: Array<() => void>
   }
@@ -17,8 +37,8 @@ interface TurnstileProps {
 }
 
 export default function Turnstile({ onVerify, onError, action }: TurnstileProps) {
-  const containerRef = useRef<HTMLDivElement>(null)
-  const widgetId = useRef<string>()
+  const containerRef = useRef<HTMLDivElement | null>(null)
+  const widgetId = useRef<string | undefined>(undefined)
 
   useEffect(() => {
     let mounted = true
@@ -39,7 +59,7 @@ export default function Turnstile({ onVerify, onError, action }: TurnstileProps)
 
           // Render new widget
           widgetId.current = window.turnstile.render(containerRef.current, {
-            sitekey: process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY,
+            sitekey: process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || '',
             callback: (token: string) => {
               console.log('Turnstile verification successful')
               onVerify(token)
@@ -68,9 +88,7 @@ export default function Turnstile({ onVerify, onError, action }: TurnstileProps)
     }
 
     // Initialize queue if it doesn't exist
-    if (!window.turnstileQueue) {
-      window.turnstileQueue = []
-    }
+    window.turnstileQueue = window.turnstileQueue || []
 
     const loadTurnstile = () => {
       // If script is already loaded, initialize immediately
@@ -80,7 +98,7 @@ export default function Turnstile({ onVerify, onError, action }: TurnstileProps)
       }
 
       // Add to queue if script is loading
-      window.turnstileQueue.push(initTurnstile)
+      window.turnstileQueue?.push(initTurnstile)
 
       // Check if script is already being loaded
       if (document.querySelector('script[src*="turnstile"]')) {
