@@ -6,7 +6,7 @@ export default function NotFound() {
       <div className="w-full max-w-md p-6 bg-white dark:bg-gray-800 rounded-lg shadow-lg text-center">
         <h1 className="text-2xl font-bold mb-6 text-foreground">404 - Page Not Found</h1>
         <p className="text-gray-600 dark:text-gray-300 mb-6">
-          Oops! The page you're looking for doesn't exist or has been moved. This could be because:
+          Oops! The page you are looking for does not exist or has been moved. This could be because:
         </p>
         <ul className="list-disc text-left text-gray-600 dark:text-gray-300 mb-6 pl-6">
           <li>The URL might be incorrect</li>
