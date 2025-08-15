@@ -20,18 +20,37 @@ LaundriFi is a modern web application designed to streamline the management of a
 - **Real-time Machine Availability**: Live updates showing which machines are available, in use, or out of service
 - **Smart Scheduling System**: Users can reserve time slots for laundry machines
 - **User Authentication**: Secure login system with email verification
+- **Anonymous Demo Mode**: One-click demo access without account creation
 - **Reservation Management**: Users can view, modify, and cancel their reservations
 - **Apartment Integration**: Links reservations to specific apartment numbers
 - **Responsive Design**: Works seamlessly on both desktop and mobile devices
 - **Dark Mode Support**: Comfortable viewing experience in any lighting condition
 
+## 🚀 Demo Mode
+
+LaundriFi now includes an **Anonymous Demo Mode** that allows users to experience the full system without creating an account:
+
+- **One-Click Access**: Users can start using the system immediately with a "Try Demo" button
+- **Full Functionality**: Demo users can book slots, manage reservations, and explore all features
+- **Data Persistence**: Demo data is preserved during the session
+- **Easy Conversion**: Users can convert their demo account to a real account by adding an email
+- **Automatic Cleanup**: Old demo accounts are automatically cleaned up after a period
+
+### How Demo Mode Works
+
+1. **Anonymous Sign-in**: Uses Supabase's `signInAnonymously()` method
+2. **Demo Data Seeding**: Automatically creates sample apartment and 1 reservation data
+3. **Session Management**: Demo users get a full authenticated experience
+4. **Account Conversion**: Users can add an email to preserve their demo data
+5. **Cleanup Process**: Automated cleanup of old demo accounts via cron job
+
 ## 🛠️ Tech Stack
 
 - **Frontend**: Next.js 14 with App Router
 - **Styling**: Tailwind CSS
-- **Authentication**: Supabase Auth
+- **Authentication**: Supabase Auth (including Anonymous Sign-in)
 - **Database**: Supabase (PostgreSQL)
-- **Deployment**: Vercel
+- **Deployment**: Vercel with Cron Jobs
 
 ## 🚀 Getting Started
 
@@ -51,6 +70,20 @@ NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 NEXT_PUBLIC_SITE_URL=http://localhost:3000
 ```
+
+### Supabase Setup
+
+1. **Enable Anonymous Sign-ins**:
+   - Go to your Supabase project dashboard
+   - Navigate to Authentication > Settings
+   - Enable "Enable anonymous sign-ins"
+
+2. **Configure RLS Policies**:
+   - Ensure your RLS policies allow anonymous users to create/read their own data
+   - Anonymous users use the `authenticated` role but have `is_anonymous: true` in JWT claims
+
+3. **Database Schema**:
+   - The existing `apartments` and `reservations` tables work with demo mode
 
 ### Installation
 

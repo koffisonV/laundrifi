@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
 import Turnstile from './Turnstile'
+import { FaSpinner } from 'react-icons/fa'
 
 export default function ResetPasswordForm() {
   const [email, setEmail] = useState('')
@@ -91,7 +92,17 @@ export default function ResetPasswordForm() {
           required
         />
       </div>
-      <Turnstile onVerify={setTurnstileToken} action="reset_password" />
+      {!turnstileToken && (
+        <div className="mb-6">
+          <div className="flex items-center justify-center space-x-3 text-gray-600 dark:text-gray-400">
+            <FaSpinner className="animate-spin text-xl" />
+            <span className="text-sm">
+              Verifying you're human... This will only take a moment
+            </span>
+          </div>
+          <Turnstile onVerify={setTurnstileToken} action="reset_password" />
+        </div>
+      )}
       <div className="text-right">
         <Link
           href="/auth/signin"
@@ -107,6 +118,14 @@ export default function ResetPasswordForm() {
       >
         {loading ? 'Sending reset link...' : 'Send Reset Link'}
       </button>
+      <div className="flex items-center justify-center space-x-3 text-gray-600 dark:text-gray-400">
+        <Link
+          href="/"
+          className="text-sm text-blue-600 hover:text-blue-500 dark:text-blue-400"
+        >
+          ← Back to Home
+        </Link>
+      </div>
     </form>
   )
 } 

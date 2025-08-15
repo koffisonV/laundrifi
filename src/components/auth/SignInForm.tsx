@@ -1,31 +1,31 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { createClient } from '@/lib/supabase/client'
-import { useRouter } from 'next/navigation'
-import Link from 'next/link'
-import { FaEye, FaEyeSlash } from 'react-icons/fa'
-import Turnstile from './Turnstile'
+import { useState } from "react";
+import { createClient } from "@/lib/supabase/client";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { FaEye, FaEyeSlash, FaSpinner } from "react-icons/fa";
+import Turnstile from "./Turnstile";
 
 export default function SignInForm() {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [error, setError] = useState<string | null>(null)
-  const [loading, setLoading] = useState(false)
-  const [passwordVisible, setPasswordVisible] = useState(false)
-  const [turnstileToken, setTurnstileToken] = useState<string | null>(null)
-  const router = useRouter()
-  const supabase = createClient()
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [passwordVisible, setPasswordVisible] = useState(false);
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  const router = useRouter();
+  const supabase = createClient();
 
   const handleSignIn = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setLoading(true)
-    setError(null)
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
 
     if (!turnstileToken) {
-      setError('Please complete the security check')
-      setLoading(false)
-      return
+      setError("Please complete the security check");
+      setLoading(false);
+      return;
     }
 
     try {
@@ -33,49 +33,58 @@ export default function SignInForm() {
         email,
         password,
         options: {
-          captchaToken: turnstileToken
-        }
-      })
+          captchaToken: turnstileToken,
+        },
+      });
 
       if (signInError) {
-        console.error('Sign in error:', signInError)
+        console.error("Sign in error:", signInError);
         // Handle specific error cases
-        if (signInError.message.includes('Invalid login credentials')) {
-          setError('Email or password is incorrect. If you have not registered yet, please sign up first.')
-        } else if (signInError.message.includes('Email not confirmed')) {
-          setError('Please verify your email before signing in.')
+        if (signInError.message.includes("Invalid login credentials")) {
+          setError(
+            "Email or password is incorrect. If you have not registered yet, please sign up first."
+          );
+        } else if (signInError.message.includes("Email not confirmed")) {
+          setError("Please verify your email before signing in.");
         } else if (signInError.status === 500) {
-          setError('Server error. Please try again in a few moments.')
+          setError("Server error. Please try again in a few moments.");
         } else {
-          setError('Unable to sign in. Please check your credentials and try again.')
+          setError(
+            "Unable to sign in. Please check your credentials and try again."
+          );
         }
-        setLoading(false)
-        return
+        setLoading(false);
+        return;
       }
 
       // Check if email is verified
-      const { data: { user }, error: userError } = await supabase.auth.getUser()
+      const {
+        data: { user },
+        error: userError,
+      } = await supabase.auth.getUser();
       if (userError) {
-        console.error('Error getting user:', userError)
-        setError('An error occurred while verifying your account.')
-        setLoading(false)
-        return
+        console.error("Error getting user:", userError);
+        setError("An error occurred while verifying your account.");
+        setLoading(false);
+        return;
       }
 
       if (!user?.email_confirmed_at) {
-        setError('Please verify your email before signing in. Check your inbox for the verification link.')
-        setLoading(false)
-        return
+        setError(
+          "Please verify your email before signing in. Check your inbox for the verification link."
+        );
+        setLoading(false);
+        return;
       }
 
-      router.push('/schedule')
-      router.refresh()
+      router.push("/schedule");
+      router.refresh();
     } catch (error) {
-      console.error('Sign in error:', error)
-      setError('An unexpected error occurred. Please try again.')
-      setLoading(false)
+      console.error("Sign in error:", error);
+      setError("An unexpected error occurred. Please try again.");
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <form onSubmit={handleSignIn} className="space-y-4">
@@ -85,7 +94,10 @@ export default function SignInForm() {
         </div>
       )}
       <div>
-        <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
+        <label
+          htmlFor="email"
+          className="block text-sm font-medium text-gray-700 dark:text-gray-200"
+        >
           Email
         </label>
         <input
@@ -98,13 +110,16 @@ export default function SignInForm() {
         />
       </div>
       <div>
-        <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
+        <label
+          htmlFor="password"
+          className="block text-sm font-medium text-gray-700 dark:text-gray-200"
+        >
           Password
         </label>
         <div className="relative">
           <input
             id="password"
-            type={passwordVisible ? 'text' : 'password'}
+            type={passwordVisible ? "text" : "password"}
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             className="mt-1 block w-full rounded-md border border-gray-300 px-3 py-2 dark:bg-gray-700 dark:border-gray-600"
@@ -119,7 +134,17 @@ export default function SignInForm() {
           </button>
         </div>
       </div>
-      <Turnstile onVerify={setTurnstileToken} />
+      {!turnstileToken && (
+        <div className="mb-6">
+          <div className="flex items-center justify-center space-x-3 text-gray-600 dark:text-gray-400">
+            <FaSpinner className="animate-spin text-xl" />
+            <span className="text-sm">
+              Verifying you're human... This will only take a moment
+            </span>
+          </div>
+          <Turnstile onVerify={setTurnstileToken} action="signin" />
+        </div>
+      )}
       <div className="flex items-center justify-between">
         <Link
           href="/auth/reset-password"
@@ -139,8 +164,16 @@ export default function SignInForm() {
         disabled={loading}
         className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 disabled:opacity-50"
       >
-        {loading ? 'Signing in...' : 'Sign In'}
+        {loading ? "Signing in..." : "Sign In"}
       </button>
+      <div className="flex items-center justify-center space-x-3 text-gray-600 dark:text-gray-400">
+        <Link
+          href="/"
+          className="text-sm text-blue-600 hover:text-blue-500 dark:text-blue-400"
+        >
+          ← Back to Home
+        </Link>
+      </div>
     </form>
-  )
+  );
 }
