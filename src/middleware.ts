@@ -61,8 +61,12 @@ export async function middleware(request: NextRequest) {
   // Check if we have a session
   const { data: { session } } = await supabase.auth.getSession()
 
+  // Define public routes that don't require authentication
+  const publicRoutes = ['/', '/demo', '/auth/signin', '/auth/signup', '/auth/reset-password', '/auth/verify-email', '/auth/update-password']
+  const isPublicRoute = publicRoutes.some(route => request.nextUrl.pathname === route)
+
   // If there's no session and the user is trying to access a protected route
-  if (!session && !request.nextUrl.pathname.startsWith('/auth')) {
+  if (!session && !isPublicRoute) {
     return NextResponse.redirect(new URL('/auth/signin', request.url))
   }
 
@@ -84,5 +88,6 @@ export const config = {
      * - public folder
      */
     '/((?!_next/static|_next/image|favicon.ico|public/).*)',
+    '/((?!api|_next/static|_next/image|favicon.ico|.*\\.).*)',
   ],
 } 

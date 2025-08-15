@@ -1,64 +1,64 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { createClient } from '@/lib/supabase/client'
-import { useRouter } from 'next/navigation'
-import Link from 'next/link'
-import { FaEye, FaEyeSlash } from 'react-icons/fa'
-import Turnstile from './Turnstile'
+import { useState } from "react";
+import { createClient } from "@/lib/supabase/client";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { FaEye, FaEyeSlash, FaSpinner } from "react-icons/fa";
+import Turnstile from "./Turnstile";
 
 export default function SignUpForm() {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [confirmPassword, setConfirmPassword] = useState('')
-  const [showPassword, setShowPassword] = useState(false)
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [loading, setLoading] = useState(false)
-  const [turnstileToken, setTurnstileToken] = useState<string | null>(null)
-  const router = useRouter()
-  const supabase = createClient()
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
+  const router = useRouter();
+  const supabase = createClient();
 
   const handleSignUp = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setLoading(true)
-    setError(null)
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
 
     if (!turnstileToken) {
-      setError('Please complete the security check')
-      setLoading(false)
-      return
+      setError("Please complete the security check");
+      setLoading(false);
+      return;
     }
 
     // Password validation
     if (password.length < 8) {
-      setError('Password must be at least 8 characters long')
-      setLoading(false)
-      return
+      setError("Password must be at least 8 characters long");
+      setLoading(false);
+      return;
     }
 
     if (!/[A-Z]/.test(password)) {
-      setError('Password must contain at least one uppercase letter')
-      setLoading(false)
-      return
+      setError("Password must contain at least one uppercase letter");
+      setLoading(false);
+      return;
     }
 
     if (!/[a-z]/.test(password)) {
-      setError('Password must contain at least one lowercase letter')
-      setLoading(false)
-      return
+      setError("Password must contain at least one lowercase letter");
+      setLoading(false);
+      return;
     }
 
     if (!/[0-9]/.test(password)) {
-      setError('Password must contain at least one number')
-      setLoading(false)
-      return
+      setError("Password must contain at least one number");
+      setLoading(false);
+      return;
     }
 
     if (password !== confirmPassword) {
-      setError('Passwords do not match')
-      setLoading(false)
-      return
+      setError("Passwords do not match");
+      setLoading(false);
+      return;
     }
 
     try {
@@ -67,26 +67,28 @@ export default function SignUpForm() {
         password,
         options: {
           emailRedirectTo: `${window.location.origin}/schedule`,
-          captchaToken: turnstileToken
+          captchaToken: turnstileToken,
         },
-      })
+      });
 
       if (authError) {
-        console.error('Sign up error:', authError)
-        setError(authError.message)
-        setLoading(false)
-        return
+        console.error("Sign up error:", authError);
+        setError(authError.message);
+        setLoading(false);
+        return;
       }
 
       if (authData?.user) {
-        router.push('/auth/verify-email')
+        router.push("/auth/verify-email");
       }
     } catch (error) {
-      console.error('Sign up error:', error)
-      setError('An unexpected error occurred during sign up. Please try again.')
-      setLoading(false)
+      console.error("Sign up error:", error);
+      setError(
+        "An unexpected error occurred during sign up. Please try again."
+      );
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <form onSubmit={handleSignUp} className="space-y-4">
@@ -96,7 +98,10 @@ export default function SignUpForm() {
         </div>
       )}
       <div>
-        <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
+        <label
+          htmlFor="email"
+          className="block text-sm font-medium text-gray-700 dark:text-gray-200"
+        >
           Email
         </label>
         <input
@@ -109,7 +114,10 @@ export default function SignUpForm() {
         />
       </div>
       <div>
-        <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
+        <label
+          htmlFor="password"
+          className="block text-sm font-medium text-gray-700 dark:text-gray-200"
+        >
           Password
         </label>
         <div className="relative">
@@ -131,7 +139,10 @@ export default function SignUpForm() {
         </div>
       </div>
       <div>
-        <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 dark:text-gray-200">
+        <label
+          htmlFor="confirmPassword"
+          className="block text-sm font-medium text-gray-700 dark:text-gray-200"
+        >
           Confirm Password
         </label>
         <div className="relative">
@@ -148,11 +159,25 @@ export default function SignUpForm() {
             onClick={() => setShowConfirmPassword(!showConfirmPassword)}
             className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300"
           >
-            {showConfirmPassword ? <FaEyeSlash size={18} /> : <FaEye size={18} />}
+            {showConfirmPassword ? (
+              <FaEyeSlash size={18} />
+            ) : (
+              <FaEye size={18} />
+            )}
           </button>
         </div>
       </div>
-      <Turnstile onVerify={setTurnstileToken} action="signup" />
+      {!turnstileToken && (
+        <div className="mb-6">
+          <div className="flex items-center justify-center space-x-3 text-gray-600 dark:text-gray-400">
+            <FaSpinner className="animate-spin text-xl" />
+            <span className="text-sm">
+              Verifying you're human... This will only take a moment
+            </span>
+          </div>
+          <Turnstile onVerify={setTurnstileToken} action="signup" />
+        </div>
+      )}
       <div className="text-right">
         <Link
           href="/auth/signin"
@@ -166,8 +191,16 @@ export default function SignUpForm() {
         disabled={loading}
         className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 disabled:opacity-50"
       >
-        {loading ? 'Creating account...' : 'Sign Up'}
+        {loading ? "Creating account..." : "Sign Up"}
       </button>
+      <div className="flex items-center justify-center space-x-3 text-gray-600 dark:text-gray-400">
+        <Link
+          href="/"
+          className="text-sm text-blue-600 hover:text-blue-500 dark:text-blue-400"
+        >
+          ← Back to Home
+        </Link>
+      </div>
     </form>
-  )
-} 
+  );
+}
