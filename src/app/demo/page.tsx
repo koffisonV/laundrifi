@@ -55,26 +55,10 @@ export default function DemoPage() {
 
       setStep("success");
 
-      // Wait for session to be established before redirecting
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (session) {
-        // Redirect to schedule page after a brief success message
-        setTimeout(() => {
-          router.push("/schedule");
-        }, 1500);
-      } else {
-        // Fallback: try to get session again after a delay
-        setTimeout(async () => {
-          const { data: { session: retrySession } } = await supabase.auth.getSession();
-          if (retrySession) {
-            router.push("/schedule");
-          } else {
-            setError("Failed to establish session. Please try again.");
-            setStep("initial");
-          }
-        }, 2000);
-      }
+      // Redirect to schedule page after a brief success message
+      setTimeout(() => {
+        router.push("/schedule");
+      }, 1500);
     } catch (err) {
       console.error("Demo setup error:", err);
       setError(
