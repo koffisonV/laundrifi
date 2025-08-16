@@ -35,7 +35,7 @@ export default function Home() {
               🚀 Try Demo
             </Link>
             <Link
-              href="/login"
+              href="/auth/signin"
               className="bg-white hover:bg-gray-50 text-gray-900 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-white px-8 py-4 rounded-lg font-semibold text-lg transition-all duration-200 transform hover:scale-105 shadow-lg border-2 border-gray-200 dark:border-gray-600"
             >
               Sign In
