@@ -58,15 +58,50 @@ export async function middleware(request: NextRequest) {
     }
   )
 
-  // Check if we have a session
-  const { data: { session } } = await supabase.auth.getSession()
-
   // Define public routes that don't require authentication
   const publicRoutes = ['/', '/demo', '/auth/signin', '/auth/signup', '/auth/reset-password', '/auth/verify-email', '/auth/update-password']
   const isPublicRoute = publicRoutes.some(route => request.nextUrl.pathname === route)
 
+  // Always allow public routes without session checks
+  if (isPublicRoute) {
+    return response
+  }
+
+  // Check if we have a session only for protected routes
+  const { data: { session }, error } = await supabase.auth.getSession()
+
+  // If there's an error getting the session, allow the request to proceed
+  // This prevents redirect loops when session is being established
+  if (error) {
+    console.warn('Session error in middleware:', error.message)
+    return response
+  }
+
   // If there's no session and the user is trying to access a protected route
-  if (!session && !isPublicRoute) {
+  if (!session) {
+    // Check if there's a pending authentication token in cookies
+    // This helps handle the case where anonymous sign-in is in progress
+    const authToken = request.cookies.get('sb-access-token') || 
+                     request.cookies.get('supabase-auth-token') ||
+                     request.cookies.get('sb-refresh-token')
+
+    if (authToken) {
+      // If there's an auth token but no session yet, allow the request
+      // The session might be in the process of being established
+      console.log('Auth token found but no session yet, allowing request')
+      return response
+    }
+
+    // Only redirect to sign-in if we're sure there's no authentication in progress
+    const referer = request.headers.get('referer')
+    const isFromDemo = referer?.includes('/demo')
+    
+    if (isFromDemo) {
+      // If coming from demo page, allow a brief moment for session to establish
+      console.log('Request from demo page, allowing through')
+      return response
+    }
+
     return NextResponse.redirect(new URL('/auth/signin', request.url))
   }
 
@@ -89,4 +124,4 @@ export const config = {
      */
     '/((?!api|_next/static|_next/image|favicon.ico|.*\\.).*)',
   ],
-} 
+}

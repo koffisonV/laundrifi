@@ -21,6 +21,19 @@ export default function DemoPage() {
   const router = useRouter();
   const supabase = createClient();
 
+  // Get the current URL for redirect
+  const getURL = () => {
+    let url =
+      process?.env?.NEXT_PUBLIC_SITE_URL ?? // Set this to your site URL in production env.
+      process?.env?.NEXT_PUBLIC_VERCEL_URL ?? // Automatically set by Vercel.
+      'http://localhost:3000/';
+    // Make sure to include `https://` when not localhost.
+    url = url.includes('http') ? url : `https://${url}`;
+    // Make sure to include a trailing `/`.
+    url = url.charAt(url.length - 1) === '/' ? url : `${url}/`;
+    return url;
+  };
+
   const startDemo = async () => {
     if (!turnstileToken) {
       setError("Please complete the security check first");
@@ -48,6 +61,8 @@ export default function DemoPage() {
         throw new Error("No user returned from anonymous sign-in");
       }
 
+      console.log("Anonymous sign-in successful:", signInData.user.id);
+
       setStep("seeding-data");
 
       // Step 2: Seed demo data
@@ -55,10 +70,45 @@ export default function DemoPage() {
 
       setStep("success");
 
-      // Redirect to schedule page after a brief success message
-      setTimeout(() => {
-        router.push("/schedule");
-      }, 1500);
+      // Wait for session to be fully established before redirecting
+      const waitForSession = async (maxAttempts = 8, delay = 500) => {
+        for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+          console.log(`Checking for session, attempt ${attempt}...`);
+          
+          const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+          
+          if (sessionError) {
+            console.error("Session error:", sessionError);
+            // Continue trying even if there's an error
+          } else if (session) {
+            console.log("Session established successfully");
+            return session;
+          }
+          
+          // Wait before next attempt
+          if (attempt < maxAttempts) {
+            await new Promise(resolve => setTimeout(resolve, delay));
+          }
+        }
+        return null;
+      };
+
+      const session = await waitForSession();
+      
+      if (session) {
+        // Use window.location.href for more reliable navigation in this case
+        console.log("Redirecting to schedule page...");
+        setTimeout(() => {
+          window.location.href = "/schedule";
+        }, 1000);
+      } else {
+        // Force navigation even if session check fails
+        // The middleware will handle the session validation
+        console.log("Session not detected, but proceeding to schedule page...");
+        setTimeout(() => {
+          window.location.href = "/schedule";
+        }, 1000);
+      }
     } catch (err) {
       console.error("Demo setup error:", err);
       setError(
@@ -75,7 +125,7 @@ export default function DemoPage() {
       const demoApartmentNumber = `${
         Math.floor(Math.random() * 9) + 1
       }${String.fromCharCode(65 + Math.floor(Math.random() * 26))}`;
-      console.log("demoApartmentNumber", demoApartmentNumber);
+      console.log("Creating demo apartment:", demoApartmentNumber);
 
       const { error: apartmentError } = await supabase
         .from("apartments")
@@ -113,6 +163,8 @@ export default function DemoPage() {
           );
         }
       }
+      
+      console.log("Demo data seeded successfully");
     } catch (err) {
       console.error("Error seeding demo data:", err);
       // Don't throw here - we want to continue even if seeding fails
