@@ -39,7 +39,6 @@ export default function SignInForm() {
 
       if (signInError) {
         console.error("Sign in error:", signInError);
-        // Handle specific error cases
         if (signInError.message.includes("Invalid login credentials")) {
           setError(
             "Email or password is incorrect. If you have not registered yet, please sign up first."

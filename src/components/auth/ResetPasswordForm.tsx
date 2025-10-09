@@ -9,7 +9,7 @@ import { FaSpinner } from 'react-icons/fa'
 export default function ResetPasswordForm() {
   const [email, setEmail] = useState('')
   const [error, setError] = useState<string | null>(null)
-  const [success, setSuccess] = useState(false)
+  const [success, setSuccess] = useState<boolean | null>(false)
   const [loading, setLoading] = useState(false)
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null)
   const supabase = createClient()
