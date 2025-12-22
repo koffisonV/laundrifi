@@ -242,7 +242,7 @@ export default function DemoPage() {
                 disabled={isLoading || !turnstileToken}
                 className="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white px-8 py-4 rounded-lg font-semibold text-lg transition-all duration-200 transform hover:scale-105 shadow-lg hover:shadow-xl disabled:transform-none disabled:cursor-not-allowed"
               >
-                {isLoading ? "Setting Up..." : "🚀 Start Demo"}
+                {isLoading ? "Setting Up..." : "Start Demo"}
               </button>
               <Link
                 href="/"
