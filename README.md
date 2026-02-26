@@ -126,5 +126,5 @@ The application uses the following main tables:
 ---
 
 <div align="center">
-  Made by Me 😁
+  Made by KV
 </div>
